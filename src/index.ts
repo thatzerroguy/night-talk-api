@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { auth } from "./lib/auth";
 
 const app = new Hono()
   .basePath("/api")
@@ -18,6 +19,8 @@ console.log(`
     - db:push: Push database schema to the database
     - db:studio: Open Drizzle Studio
   `);
+
+app.on(["POST", "GET"], "/v1/auth/*", (c) => auth.handler(c.req.raw));
 
 Bun.serve({
   fetch: app.fetch,
