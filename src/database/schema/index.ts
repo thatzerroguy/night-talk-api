@@ -1,1 +1,1 @@
-export { user, session, account, verification, userRelations, sessionRelations, accountRelations } from "./auth.schema";
+export { user, session, account, verification, userRelations, sessionRelations, accountRelations } from "@/database/schema/auth.schema";

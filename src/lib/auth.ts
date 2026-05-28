@@ -1,8 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "../database/db";
+import { db } from "@/database/db";
 import { openAPI } from "better-auth/plugins";
-import { user, session, account, verification, userRelations, sessionRelations, accountRelations } from "../database/schema";
+import { user, session, account, verification, userRelations, sessionRelations, accountRelations } from "@/database/schema";
+import { expo } from "@better-auth/expo";
 
 const BETTER_AUTH_URL = 
   (typeof Bun !== "undefined")
@@ -24,12 +25,23 @@ const GOOGLE_CLIENT_SECRET =
     ? Bun.env.GOOGLE_CLIENT_SECRET
     : process.env.GOOGLE_CLIENT_SECRET
 
+// EXPO DEV exp:// scheme
+const EXPO_DEV_ORIGIN = 
+  (Bun.env.NODE_ENV === "development" || process.env.NODE_ENV === "development")
+    ? ["exp://", "exp://*", "exp://192.168.*.*:*/**"]
+    : []
+
 
 export const auth = betterAuth({
   appName: "Night Talk",
   baseUrl: BETTER_AUTH_URL,
   secret: BETTER_AUTH_SECRET,
   basePath: "/v1/auth",
+  trustedOrigins: [
+    "nighttalk://",
+    "nighttalk://*",
+    ...EXPO_DEV_ORIGIN,
+  ],
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
@@ -52,6 +64,7 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    openAPI()
+    openAPI(),
+    expo()
   ]
 })
